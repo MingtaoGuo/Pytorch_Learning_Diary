@@ -57,7 +57,7 @@ class ResBlock(nn.Module):
         return x
 ```
 ## Day 4
-1. Implementing the CNN: DenseNet in GPU. It's different from Day 3 and successful.
+1. Implementing the CNN: DenseNet in GPU. It's different from Day 3 and successful. The Accurancy of validation about 0.88.
 
 ## Day 5
 1. In order to know how to use pre-trained model in pytorch, the plan of Day 5 is to implementing the style transfer.
