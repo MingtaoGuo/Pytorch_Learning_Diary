@@ -1,6 +1,8 @@
 # Pytorch_Learning_Diary
 Learning pytorch on TensorFlow basis, and write down every error I meet.
-
+### Day 1-4: How to construct a CNN [VGG16, ResNet, DenseNet], simple to complex.
+###   Day 5: How to use a pre-trained model [Style transfer]
+###   Day 6: How to edit the parameters in CNN [GAN, WGAN, WGAN-GPU etc.]
 ## Day 1 
 1. Reading the turorial on the pytorch official website https://pytorch.org/tutorials/
 2. According to the tutorial, implementing the basic pytorch code and understanding the back-propagation mechanism of pytorch.
@@ -57,6 +59,8 @@ class ResBlock(nn.Module):
 ## Day 4
 1. Implementing the CNN: DenseNet in GPU. It's different from Day 3 and successful.
 
+## Day 5
+1. In order to know how to use pre-trained model in pytorch, the plan of Day 5 is to implementing the style transfer.
 # Some error in learning
 1. In order
 ```Python
