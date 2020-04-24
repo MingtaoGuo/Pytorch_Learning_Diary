@@ -83,4 +83,8 @@ device = "cuda:0" if torch.cuda.is_available() else "cpu"
 net.to(device)
 data.to(device)
 ```
+5. Global pooling
+```Python
+self.global_pool = nn.AdaptiveAvgPool2d(1)
+```
 #### To be continued
