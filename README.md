@@ -91,4 +91,35 @@ data.to(device)
 ```Python
 self.global_pool = nn.AdaptiveAvgPool2d(1)
 ```
+6. Pre-trained model DIY
+```Python
+vgg19 = models.vgg19(pretrained=True)
+class Net(nn.Module):
+    def __init__(self):
+        super(Net, self).__init__()
+        self.net_1_1 = nn.Sequential(*list(list(vgg19.children())[0])[:1])
+        self.net_2_1 = nn.Sequential(*list(list(vgg19.children())[0])[1:6])
+        self.net_3_3 = nn.Sequential(*list(list(vgg19.children())[0])[6:15])
+        self.net_4_3 = nn.Sequential(*list(list(vgg19.children())[0])[15:24])
+        self.net_5_3 = nn.Sequential(*list(list(vgg19.children())[0])[24:33])
+
+    def forward(self, x):
+        f_1_1 = self.net_1_1(x)
+        f_2_1 = self.net_2_1(f_1_1)
+        f_3_3 = self.net_3_3(f_2_1)
+        f_4_3 = self.net_4_3(f_3_3)
+        f_5_3 = self.net_5_3(f_4_3)
+        return [f_1_1, f_2_1, f_3_3, f_4_3, f_5_3]
+```
+7. Parameters with grad or without grad
+```Python
+vgg19 = models.vgg19(pretrained=True)
+#the model parameters
+for p in list(vgg19.parameters()):
+    p.requires_grad_(False)
+#the single parameters
+x = torch.randn_like(p)#tensor(content, dtype=torch.float32)#fusion
+x.requires_grad = True
+```
+
 #### To be continued
