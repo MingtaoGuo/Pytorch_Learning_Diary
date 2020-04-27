@@ -121,5 +121,18 @@ for p in list(vgg19.parameters()):
 x = torch.randn_like(p)#tensor(content, dtype=torch.float32)#fusion
 x.requires_grad = True
 ```
-
+8. Model initialization
+```Python
+for m in self.modules():
+    if isinstance(m, nn.Conv2d):
+        nn.init.kaiming_normal_(m.weight)
+    elif isinstance(m, nn.BatchNorm2d):
+        nn.init.constant(m.weight, 1)
+        nn.init.constant(m.bias, 0)
+```
+9. Weights cliping
+```Python
+for para in discriminator.parameters():
+    para.data.clamp_(-0.01, 0.01)
+```
 #### To be continued
