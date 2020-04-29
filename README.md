@@ -135,4 +135,11 @@ for m in self.modules():
 for para in discriminator.parameters():
     para.data.clamp_(-0.01, 0.01)
 ```
+10. Pre-trained model data preprocess
+```Python
+import torchvision.transforms as transforms
+normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                 std=[0.229, 0.224, 0.225])
+norm = normalize(img)#img: 3x224x224, range[0, 1], dtype: torch tensor
+```
 #### To be continued
