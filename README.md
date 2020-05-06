@@ -61,6 +61,9 @@ class ResBlock(nn.Module):
 
 ## Day 5
 1. In order to know how to use pre-trained model in pytorch, the plan of Day 5 is to implementing the style transfer.
+
+## Day 6
+1. Inplementing the spectral normalization GAN, it can help us to understand the module and parameters.
 # Some error in learning
 1. In order
 ```Python
@@ -141,5 +144,30 @@ import torchvision.transforms as transforms
 normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                  std=[0.229, 0.224, 0.225])
 norm = normalize(img)#img: 3x224x224, range[0, 1], dtype: torch tensor
+```
+11. Runtime out of memery, use detach() to handle this problem
+Because in loop, pytorch will accumulate graph to use memory again and again
+```Python
+class SpectralNorm(nn.Module):
+    def __init__(self, out_ch, iter=1):
+        super(SpectralNorm, self).__init__()
+        self.iter = iter
+        self.u = nn.Parameter(torch.randn(out_ch, 1), requires_grad=False).to("cuda:0")
+        self.out_ch = out_ch
+
+    def forward(self, W):
+        #W: out x in, u: out x 1
+        for i in range(self.iter):
+            v = l2_norm(torch.matmul(W.transpose(1, 0), self.u))
+            self.u = l2_norm(torch.matmul(W, v)).detach() # If remove the detach() operation, in training , show "out of memory" 
+        sigma = torch.matmul(torch.matmul(self.u.transpose(1, 0), W), v).detach()
+        W = W / sigma.clamp_min(1e-10)
+        # del sigma, v
+        return W
+```
+12. Save model
+```Python
+torch.save(network, "./model.pth")
+torch.load("./model.pth")
 ```
 #### To be continued
