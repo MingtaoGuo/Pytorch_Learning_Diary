@@ -64,6 +64,8 @@ class ResBlock(nn.Module):
 
 ## Day 6
 1. Inplementing the spectral normalization GAN, it can help us to understand the module and parameters.
+## Day 7
+1. Inplementing the YOLO V1
 # Some error in learning
 1. In order
 ```Python
