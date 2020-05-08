@@ -170,4 +170,9 @@ class SpectralNorm(nn.Module):
 torch.save(network, "./model.pth")
 torch.load("./model.pth")
 ```
+13. Pretrained model
+```Python
+model = torchvision.models.resnet50(pretrained=True)
+model.eval()#This is important!!!!Because of the batch normalization
+```
 #### To be continued
