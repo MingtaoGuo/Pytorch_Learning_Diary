@@ -169,8 +169,13 @@ class SpectralNorm(nn.Module):
 ```
 12. Save model
 ```Python
-torch.save(network, "./model.pth")
-torch.load("./model.pth")
+#Load model
+checkpoint = torch.load("./model.pth")
+model.load_state_dict(checkpoint["model"])
+Opt.load_state_dict(checkpoint["Opt"])
+#Save model
+state = {'model':model.state_dict(), 'Opt':Opt.state_dict(), 'itr':i}
+torch.save(state, "./model.pth")
 ```
 13. Pretrained model
 ```Python
