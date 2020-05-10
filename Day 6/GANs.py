@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.autograd as autograd
 import numpy as np
 import scipy.io as sio
 from PIL import Image
@@ -77,8 +78,6 @@ class Discriminator(nn.Module):
         x = self.linear(x)
         return x
 
-def weight_clip(model, min_, max_):
-    params = list(model.parameters())
 
 def DCGAN():
     generator = Generator()
@@ -146,5 +145,50 @@ def WGAN():
           Image.fromarray(img).save("./results/"+str(i)+".jpg")
           print("Iteration: %d, D_loss: %f, G_loss: %f"%(i, d_loss, g_loss))
 
+def WGANGP():
+    def gradient_penalty(x_real, x_fake, D, lambda_=10):
+        eps = torch.rand(1, 1, 1, 1).to("cuda:0")
+        x_hat = eps * x_real + (1. - eps) * x_fake
+        outputs = D(x_hat)
+        grads = autograd.grad(outputs, x_hat, torch.ones_like(outputs), retain_graph=True, create_graph=True)[0]
+        grads = grads.view(grads.size()[0], -1)
+        penalty = lambda_ * (torch.norm(grads, p=2, dim=1).mean() - 1) ** 2
+        return penalty
+
+    generator = Generator()
+    discriminator = Discriminator()
+    generator.to("cuda:0")
+    discriminator.to("cuda:0")
+    opt_g = torch.optim.Adam(generator.parameters(), lr=1e-4, betas=(0, 0.9))
+    opt_d = torch.optim.Adam(discriminator.parameters(), lr=1e-4, betas=(0, 0.9))
+    data = sio.loadmat("./facedata.mat")["data"]
+    data = np.transpose(data, axes=[0, 3, 1, 2])
+    nums = data.shape[0]
+    for i in range(100000):
+        for j in range(1):
+            rand_idx = np.random.randint(0, nums, [batchsize])
+            batch = data[rand_idx] / 127.5 - 1.0
+            batch = torch.tensor(batch, dtype=torch.float32).to("cuda:0")
+            z = torch.randn(batchsize, 128).to("cuda:0")
+            fake_img = generator(z)
+            fake_logits = discriminator(fake_img)
+            real_logits = discriminator(batch)
+            penalty = gradient_penalty(batch, fake_img, discriminator, lambda_=10)
+            d_loss = -torch.mean(real_logits) + torch.mean(fake_logits) + penalty
+            opt_d.zero_grad()
+            d_loss.backward(retain_graph=True)
+            opt_d.step()
+        z = torch.randn(batchsize, 128).to("cuda:0")
+        fake_img = generator(z)
+        fake_logits = discriminator(fake_img)
+        g_loss = -torch.mean(fake_logits)
+        opt_g.zero_grad()
+        g_loss.backward(retain_graph=True)
+        opt_g.step()
+        if i % 100 == 0:
+          img = np.uint8(np.transpose((fake_img.cpu().detach().numpy()[0]+1)*127.5, axes=[1, 2, 0]))
+          Image.fromarray(img).save("./results/"+str(i)+".jpg")
+          print("Iteration: %d, D_loss: %f, G_loss: %f"%(i, d_loss, g_loss))
+
 if __name__ == "__main__":
-    WGAN()
+    WGANGP()
