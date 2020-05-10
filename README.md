@@ -182,4 +182,9 @@ torch.save(state, "./model.pth")
 model = torchvision.models.resnet50(pretrained=True)
 model.eval()#This is important!!!!Because of the batch normalization
 ```
+14. Gradient
+```Python
+outputs = D(x_hat)
+grads = autograd.grad(outputs, x_hat, torch.ones_like(outputs), retain_graph=True, create_graph=True)[0]
+```
 #### To be continued
